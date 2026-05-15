@@ -1,0 +1,23 @@
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Enum, UniqueConstraint
+from sqlalchemy.orm import relationship
+from database import Base
+from datetime import datetime
+
+class Card(Base):
+    __tablename__ = "cards"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    scryfall_id = Column(String, unique=True, nullable=False, index=True)
+    name = Column(String)
+    
+    type_line = Column(String)
+    rarity = Column(String)
+
+    mana_cost = Column(String, nullable=True)
+    image_url = Column(String, nullable=True)
+
+    oracle_text = Column(String, nullable=True) # Para filtrar cartas por efectos, etc...
+
+    collection_cards = relationship("CollectionCard", back_populates="card")
+  
