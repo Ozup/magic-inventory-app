@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 import requests
+from database import engine
+from models import Base
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
 
-@app.get("/") # Decorador 
+@app.get("/") 
 def home():
     return {"message": "Hola Samuel"}
 
