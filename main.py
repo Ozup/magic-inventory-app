@@ -1,14 +1,15 @@
 import requests
-from models import Base, Collection
+from models.collection import Collection
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from database import engine, get_db
-
+from database import Base, engine, get_db
 from pydantic import BaseModel #FastAPI lee, valida y convierte con esto, sirve para el CRUD
 
+
+from schemas.collection import CollectionCreate, CollectionResponse 
+
 app = FastAPI()
-class CollectionCreate(BaseModel):
-    name: str
+
 Base.metadata.create_all(bind=engine)
 
 @app.get("/search/{card_name}")
@@ -36,14 +37,14 @@ def get_collections(db: Session = Depends(get_db)):
     for collection in collections
 ]
 
-@app.post("/collections")
+@app.post("/collections", response_model=CollectionResponse) # Le explico a FastAPI como quiero mi respuesta
 def create_collection(
     collection: CollectionCreate,
     db: Session = Depends(get_db)
 ):
 
     new_collection = Collection(
-        name=collection.name
+        name=collection.name, type=collection.type
     )
 
     db.add(new_collection)
@@ -52,7 +53,4 @@ def create_collection(
 
     db.refresh(new_collection)
 
-    return {
-        "id": new_collection.id,
-        "name": new_collection.name
-    }
+    return new_collection
