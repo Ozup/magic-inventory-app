@@ -63,3 +63,22 @@ def create_collection(
     db.refresh(new_collection)
 
     return new_collection
+
+@app.delete("/collections/{collection_id}")
+def delete_collection(
+    collection_id: int,
+    db: Session = Depends(get_db)
+):
+
+    collection = db.query(Collection).filter(
+        Collection.id == collection_id
+    ).first()
+
+    if not collection:
+        return {"error": "Collection not found"}
+
+    db.delete(collection)
+
+    db.commit()
+
+    return {"message": "Collection deleted successfully"}
