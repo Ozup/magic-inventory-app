@@ -6,7 +6,8 @@ from database import Base, engine, get_db
 from pydantic import BaseModel #FastAPI lee, valida y convierte con esto, sirve para el CRUD
 
 
-from schemas.collection import CollectionCreate, CollectionResponse 
+from schemas.collection import CollectionCreate, CollectionResponse, CollectionUpdate
+
 
 app = FastAPI()
 
@@ -82,3 +83,28 @@ def delete_collection(
     db.commit()
 
     return {"message": "Collection deleted successfully"}
+
+@app.put("/collections/{collection_id}")
+def update_collection(
+    collection_id: int,
+    collection_data: CollectionUpdate,
+    db: Session = Depends(get_db)
+):
+
+    collection = db.query(Collection).filter(
+        Collection.id == collection_id
+    ).first()
+
+    if not collection:
+        return {"error": "Collection not found"}
+
+    update_data = collection_data.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(collection, key, value)
+
+    db.commit()
+
+    db.refresh(collection)
+
+    return collection

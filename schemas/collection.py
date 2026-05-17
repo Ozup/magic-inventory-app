@@ -14,3 +14,7 @@ class CollectionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class CollectionUpdate(BaseModel):
+    name: str | None = None
+    type: CollectionType | None = None
