@@ -31,11 +31,20 @@ def get_collections(db: Session = Depends(get_db)):
     collections = db.query(Collection).all()
     return [
     {
-        "id": "collection.id",
+        "id": collection.id,
         "name": collection.name
     }
     for collection in collections
 ]
+
+@app.get("/collections/{collection_id}")
+def get_collection(collection_id: int, db: Session = Depends(get_db)):
+
+    collection = db.query(Collection).filter(
+        Collection.id == collection_id
+    ).first()
+
+    return collection
 
 @app.post("/collections", response_model=CollectionResponse) # Le explico a FastAPI como quiero mi respuesta
 def create_collection(
